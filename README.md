@@ -27,21 +27,21 @@ This loss function is sensitive to the *ratio* of predicted values to the actual
    * Munge YearMade to strip out low vals
  * Product Group
  * Product Size
-   
+
 * Second pass -- Explore these options (before partition):
    * Product class (contains information about "heft" of machinery... how much power it has, how deep it digs, etc.)
    * Data Source
    * AuctioneerID
    * State - Large # of Dummies -- Group into regions?
    * Enclosure
-   
+
 * Compare linear models to ensemble tree models
 
 ## Still to do:
 * Remove SalesID from train and test data.
 * Add in year made to linear models.
 * Find a better way to split off target variable, without using .pop()
-* Do more feature engineering. 
+* Do more feature engineering.
   * Add a feature that is a count of how many times that machineID appears in dataset.
   * Add more higher-order terms
 * Fit a ridge regressor
@@ -61,21 +61,21 @@ Lessons:
 2. **Use intuition.**
  - Think about which features may send the strongest signal, as if you weren't fitting a model.
  - This can be done *without looking at the data*; thinking about the problem has no risk of overfitting.
-  
+
 3. **Avoid data leakage**
   - Any transformations of the training data that *learn parameters* (e.g., standardization learns the mean and variance of a feature) must only use parameters learned from the *training data*.
 
-4. **Linear models have limitations.** 
+4. **Linear models have limitations.**
   - In addition to satisfying a number of theoretical assumptions, linear models pose some practical problems..
   - Must consider how to transform continuous predictors.
   - Must create lots of dummy variables for categorical predictors.
      - This means adding a lot of columns in a consistent way to both training and evauation sets.
      - Some columns in the test data will take on values not seen in the training data  
-     
+
 5. **Mini Lessons:**
   * Use pd.merge() instead of pd.join() in most instances
   * Look for encoding of strings by printing an individual cell when things don't match up correctly
-  
+
 ## Open questions:
 * No need to create ordinal variables? (Don't want to lock yourself into linear form).
 * Is there a way to get matplotlib to plot datetime values? Only work around I found was to convert datetime to an integer using:  ```pd.to_numeric(<datetimecol>)```
@@ -87,6 +87,6 @@ Sometimes it does this for .replace(), .dropna(), new column creation (df["newco
 * How/why could Lasso model perform worse than non-regularized linear model, out of sample?
 * How/why could ensemble models perform worse, out of sample (especially random forest, which resists overfitting)? Is it not extrapolating well because test data varies quite a bit from train data?
   * regression r^2 : .65
-  * random forest r^2: .90 
+  * random forest r^2: .90
 * Why is k-folds cross-validation failing for linear regression when k > 3? (Still works for ensemble methods)
-* How to handle negative predicitons when y can/should only be positive (as is the case with sale price)?
+* How to handle negative predictons when y can/should only be positive (as is the case with sale price)?
