@@ -1,4 +1,4 @@
-Goal
+# Goal
 =========================
 The goal of the contest is to predict the sale price of a particular piece of heavy equipment at auction based on its usage, equipment type, and configuration.  The data come from auction result postings.
 
@@ -19,7 +19,7 @@ where *p<sub>i</sub>* are the predicted values and *a<sub>i</sub>* are the targe
 This loss function is sensitive to the *ratio* of predicted values to the actual values, a prediction of 200 for an actual value of 100 contributes approximately the same amount to the loss as a prediction of 2000 for an actual value of 1000.  This is because  a difference of logarithms is equal to a single logarithm of a ratio.
 
 ## Approach:  
-* EDA: value counts and group-bys vs target
+* EDA
 * First pass for model fitting:
  * Age
    * Convert "saledate" column to datetime format
@@ -28,7 +28,7 @@ This loss function is sensitive to the *ratio* of predicted values to the actual
  * Product Group
  * Product Size
 
-* Second pass -- Explore these options (before partition):
+* Second pass -- Explore these options:
    * Product class (contains information about "heft" of machinery... how much power it has, how deep it digs, etc.)
    * Data Source
    * AuctioneerID
@@ -37,7 +37,7 @@ This loss function is sensitive to the *ratio* of predicted values to the actual
 
 * Compare linear models to ensemble tree models
 
-## Still to do:
+## TODO:
 * Remove SalesID from train and test data.
 * Add in year made to linear models.
 * Find a better way to split off target variable, without using .pop()
@@ -51,8 +51,8 @@ This loss function is sensitive to the *ratio* of predicted values to the actual
 * Implement a preprocessing pipeline and a gridsearch for ensemble methods.
 * Fit XG-Boost regressor
 
-Lessons:
-=============
+## Lessons:
+
 
 1. **Start simply:**
   * Triage. Use judgement about where your cleaning efforts will yield the most results and focus there first.
@@ -66,27 +66,30 @@ Lessons:
   - Any transformations of the training data that *learn parameters* (e.g., standardization learns the mean and variance of a feature) must only use parameters learned from the *training data*.
 
 4. **Linear models have limitations.**
-  - In addition to satisfying a number of theoretical assumptions, linear models pose some practical problems..
-  - Must consider how to transform continuous predictors.
+  - In addition to making theoretical assumptions for he purpose of statistical inference, linear models pose some practical problems..
+  - Must consider how to normalize continuous predictors.
   - Must create lots of dummy variables for categorical predictors.
-     - This means adding a lot of columns in a consistent way to both training and evauation sets.
-     - Some columns in the test data will take on values not seen in the training data  
+    - Creating an ordinal variable will lock you into a linear form
+    - This means adding a lot of columns in a consistent way to both training and evauation sets.
+      - Some columns in the test data will take on values not seen in the training data
+  - Without workarouds, a linear model can produce negative predictions, even when that is nonsensical (as is the case with a sale price).
+
 
 5. **Mini Lessons:**
-  * Use pd.merge() instead of pd.join() in most instances
-  * Look for encoding of strings by printing an individual cell when things don't match up correctly
+  - Use pd.merge() instead of pd.join() in most instances
+  - Look for encoding of strings by printing an individual cell when things don't match up correctly
+  - Need special procedure to get matplotlib to plot datetime values
+  - Need an entirely new approach to avoid the common pandas problem  when trying to map new values onto a column or create a new column
+    ```python
+    "A value is trying to be set on a copy of a slice from a DataFrame"
+    ```
+    - Sometimes it does this for .replace(), .dropna(), new column creation (df["newcol"] = df[col1] + df[col2]). even when using .loc[], as suggested by docs.
+
 
 ## Open questions:
-* No need to create ordinal variables? (Don't want to lock yourself into linear form).
-* Is there a way to get matplotlib to plot datetime values? Only work around I found was to convert datetime to an integer using:  ```pd.to_numeric(<datetimecol>)```
-* What is the best way to map new values onto a column or create a new column? Pandas keeps throwing an error message:
-```python
-"A value is trying to be set on a copy of a slice from a DataFrame"
-```
-Sometimes it does this for .replace(), .dropna(), new column creation (df["newcol"] = df[col1] + df[col2]). even when using .loc[], as suggested by docs.
+
 * How/why could Lasso model perform worse than non-regularized linear model, out of sample?
 * How/why could ensemble models perform worse, out of sample (especially random forest, which resists overfitting)? Is it not extrapolating well because test data varies quite a bit from train data?
   * regression r^2 : .65
   * random forest r^2: .90
 * Why is k-folds cross-validation failing for linear regression when k > 3? (Still works for ensemble methods)
-* How to handle negative predictons when y can/should only be positive (as is the case with sale price)?
